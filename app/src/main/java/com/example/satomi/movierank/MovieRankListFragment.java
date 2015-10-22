@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Satomi on 10/21/15.
@@ -37,7 +38,7 @@ public class MovieRankListFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMovieRankAdapter = new MovieRankAdapter(getActivity(), MovieSet.list);
+        mMovieRankAdapter = new MovieRankAdapter(getActivity(), new ArrayList<String>());
         setListAdapter(mMovieRankAdapter);
     }
 
