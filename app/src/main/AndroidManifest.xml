@@ -19,6 +19,9 @@
         </activity>
         <activity android:name=".SettingsActivity" >
         </activity>
+        <activity android:name=".DetailActivity"
+            android:label="@string/detail_activity">
+        </activity>
     </application>
 
 </manifest>

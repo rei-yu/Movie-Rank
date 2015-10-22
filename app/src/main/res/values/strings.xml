@@ -2,6 +2,7 @@
     <string name="app_name">Movie Rank</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="detail_activity">Movie Info</string>
 
     <string name="pref_rank_label">Rank by</string>
     <string name="pref_rank_key" translatable="false">Rank by</string>

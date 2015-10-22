@@ -2,6 +2,7 @@ package com.example.satomi.movierank;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
@@ -44,6 +46,16 @@ public class MovieRankListFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         mMovieRankAdapter = new MovieRankAdapter(getActivity(), new ArrayList<String>());
         setListAdapter(mMovieRankAdapter);
+
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String movie = mMovieRankAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                                                .putExtra(Intent.EXTRA_TEXT, movie);
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateRank() {
