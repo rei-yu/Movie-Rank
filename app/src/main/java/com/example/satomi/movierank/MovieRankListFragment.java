@@ -2,9 +2,11 @@ package com.example.satomi.movierank;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Satomi on 10/21/15.
@@ -121,6 +123,8 @@ public class MovieRankListFragment extends ListFragment {
             String movieRankStr = null;
 
             String rank_popurality = "popularity.desc";
+            String rank_rate = "vote_average.desc";
+            String sort_parameter = rank_popurality;
 
             try {
                 final String TMD_BASE_URL_RANK = "https://api.themoviedb.org/3/discover/movie";
@@ -128,8 +132,15 @@ public class MovieRankListFragment extends ListFragment {
                 final String SORT_PARAM = "sort_by";
                 final String API_KEY = "api_key";
 
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String rank_type = prefs.getString(getString(R.string.pref_rank_key), getString(R.string.pref_rank_popular));
+
+                if (rank_type.equals(getString(R.string.pref_rank_rate))) {
+                    sort_parameter = rank_rate;
+                }
+
                 Uri builtUri = Uri.parse(TMD_BASE_URL_RANK).buildUpon()
-                        .appendQueryParameter(SORT_PARAM, rank_popurality)
+                        .appendQueryParameter(SORT_PARAM, sort_parameter)
                         .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
                         .build();
 
