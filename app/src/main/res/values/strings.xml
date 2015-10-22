@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Movie Rank</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <string name="pref_rank_label">Rank by</string>
+    <string name="pref_rank_key" translatable="false">Rank by</string>
+
+    <string name="pref_rank_popular">popularity</string>
+    <string name="pref_rank_rate">rate</string>
+
+    <string name="pref_rank_label_popular">Popularity</string>
+    <string name="pref_rank_label_rate">Rate</string>
 </resources>
