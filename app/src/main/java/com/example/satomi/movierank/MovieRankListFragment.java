@@ -12,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,8 +75,10 @@ public class MovieRankListFragment extends ListFragment {
                 view = convertView;
             }
 
-            TextView textView = (TextView) view.findViewById(R.id.list_item_movie_rank_textview);
-            textView.setText(getItem(position));
+            ImageView imageView = (ImageView) view.findViewById(R.id.list_item_movie_rank_imageview);
+
+            String url = "http://image.tmdb.org/t/p/w500/" + getItem(position);
+            Picasso.with(getContext()).load(url).into(imageView);
 
             return view;
         }
@@ -108,7 +112,8 @@ public class MovieRankListFragment extends ListFragment {
                 String synopsis  = movieInfo.getString(OWM_OVERVIEW);
                 String poster_path = movieInfo.getString(OWM_POSTER_PATH);
 
-                resultStrs[i] = "title: " + title + "\nrelease date: " + release_date + "\nvote average: " + vote_ave + "\nsynopsis: " + synopsis + "\nposter: " + poster_path;
+//                resultStrs[i] = "title: " + title + "\nrelease date: " + release_date + "\nvote average: " + vote_ave + "\nsynopsis: " + synopsis + "\nposter: " + poster_path;
+                resultStrs[i] = poster_path;
             }
 
             return resultStrs;
@@ -128,7 +133,6 @@ public class MovieRankListFragment extends ListFragment {
 
             try {
                 final String TMD_BASE_URL_RANK = "https://api.themoviedb.org/3/discover/movie";
-                final String TMD_BASE_URL_POSTER = "http://image.tmdb.org/t/p/w500/";
                 final String SORT_PARAM = "sort_by";
                 final String API_KEY = "api_key";
 
