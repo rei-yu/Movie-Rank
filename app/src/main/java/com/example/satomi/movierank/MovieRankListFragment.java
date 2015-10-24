@@ -50,17 +50,15 @@ public class MovieRankListFragment extends ListFragment {
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String movie = mMovieRankAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                                                .putExtra(Intent.EXTRA_TEXT, movie);
-                startActivity(intent);
+                FetchRankTask getDetailTask = new FetchRankTask();
+                getDetailTask.execute("get_detail", String.valueOf(position));
             }
         });
     }
 
     private void updateRank() {
         FetchRankTask getRankTask = new FetchRankTask();
-        getRankTask.execute();
+        getRankTask.execute("get_poster", "0");
     }
 
     @Override
@@ -89,7 +87,7 @@ public class MovieRankListFragment extends ListFragment {
 
             ImageView imageView = (ImageView) view.findViewById(R.id.list_item_movie_rank_imageview);
 
-            String url = "http://image.tmdb.org/t/p/w500/" + getItem(position);
+            String url = "http://image.tmdb.org/t/p/w780/" + getItem(position);
             Picasso.with(getContext()).load(url).into(imageView);
 
             return view;
@@ -99,38 +97,6 @@ public class MovieRankListFragment extends ListFragment {
     public class FetchRankTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchRankTask.class.getSimpleName();
-
-        private String[] getMovieRankDataFromJson(String movieRankStr)
-                throws JSONException {
-
-            final String OWM_RESULTS = "results";
-            final String OWM_TITLE = "title";
-            final String OWM_OVERVIEW = "overview";
-            final String OWM_POSTER_PATH = "poster_path";
-            final String OWM_RELEASE_DATE = "release_date";
-            final String OWM_VOTE_AVERAGE = "vote_average";
-
-            JSONObject movieRankJson = new JSONObject(movieRankStr);
-            JSONArray movieRankArray = movieRankJson.getJSONArray(OWM_RESULTS);
-
-            String[] resultStrs = new String[20];
-
-            for(int i = 0; i < 20; i++) {
-                JSONObject movieInfo = movieRankArray.getJSONObject(i);
-
-                String title = movieInfo.getString(OWM_TITLE);
-                String release_date = movieInfo.getString(OWM_RELEASE_DATE);
-                String vote_ave = movieInfo.getString(OWM_VOTE_AVERAGE);
-                String synopsis  = movieInfo.getString(OWM_OVERVIEW);
-                String poster_path = movieInfo.getString(OWM_POSTER_PATH);
-
-//                resultStrs[i] = "title: " + title + "\nrelease date: " + release_date + "\nvote average: " + vote_ave + "\nsynopsis: " + synopsis + "\nposter: " + poster_path;
-                resultStrs[i] = poster_path;
-            }
-
-            return resultStrs;
-        }
-
 
         @Override
         protected String[] doInBackground(String... params) {
@@ -199,25 +165,89 @@ public class MovieRankListFragment extends ListFragment {
                     }
                 }
             }
-
-            try {
-                return getMovieRankDataFromJson(movieRankStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-
-            return null;
+                    //set of    dataType,  resultString, position(default 0, from onClick)
+            String[] result = { params[0], movieRankStr, params[1] };
+            return result;
         }
 
         protected void onPostExecute(String[] result) {
-            if (result != null) {
-                mMovieRankAdapter.clear();
+            if (result[1] != null) {
+                String type = result[0];
 
-                for(String movieSummary : result) {
-                    mMovieRankAdapter.add(movieSummary);
+                if (type.equals(getString(R.string.get_poster))) {
+                    try {
+                        String[] parsedResult = getMoviePosterFromJson(result[1]);
+
+                        mMovieRankAdapter.clear();
+                        for(String moviePoster : parsedResult) {
+                            mMovieRankAdapter.add(moviePoster);
+                        }
+                    } catch (JSONException e) {
+                        Log.e(LOG_TAG, "Error parsing JSON for Posters");
+                    }
+
+                } else if (type.equals(getString(R.string.get_detail))) {
+                    try {
+                        String movie_detail = getMovieDetailFromJson(result[1], Integer.parseInt(result[2]));
+                        Intent intent = new Intent(getActivity(), DetailActivity.class)
+                                .putExtra(Intent.EXTRA_TEXT, movie_detail);
+                        startActivity(intent);
+
+                    } catch (JSONException e) {
+                        Log.e(LOG_TAG, "Error parsing JSON for Movie Detail");
+                    }
                 }
             }
+        }
+
+        private String getMovieDetailFromJson(String movieRankStr, int position)
+                throws JSONException {
+
+            final String OWM_RESULTS = "results";
+            final String OWM_TITLE = "title";
+            final String OWM_OVERVIEW = "overview";
+            final String OWM_RELEASE_DATE = "release_date";
+            final String OWM_VOTE_AVERAGE = "vote_average";
+
+            JSONObject movieRankJson = new JSONObject(movieRankStr);
+            JSONArray movieRankArray = movieRankJson.getJSONArray(OWM_RESULTS);
+
+            String[] resultStrs = new String[20];
+
+            for(int i = 0; i < 20; i++) {
+                JSONObject movieInfo = movieRankArray.getJSONObject(i);
+
+                String title = movieInfo.getString(OWM_TITLE);
+                String release_date = movieInfo.getString(OWM_RELEASE_DATE);
+                String vote_ave = movieInfo.getString(OWM_VOTE_AVERAGE);
+                String synopsis  = movieInfo.getString(OWM_OVERVIEW);
+
+                resultStrs[i] = "title: " + title + "\nrelease date: " + release_date + "\nvote average: " + vote_ave + "\nsynopsis: " + synopsis;
+            }
+
+            return resultStrs[position];
+        }
+
+        private String[] getMoviePosterFromJson(String movieRankStr)
+                throws JSONException {
+
+            final String OWM_RESULTS = "results";
+            final String OWM_POSTER_PATH = "poster_path";
+
+            JSONObject movieRankJson = new JSONObject(movieRankStr);
+            JSONArray movieRankArray = movieRankJson.getJSONArray(OWM_RESULTS);
+
+            String[] resultStrs = new String[20];
+
+            for(int i = 0; i < 20; i++) {
+                JSONObject movieInfo = movieRankArray.getJSONObject(i);
+
+                String poster_path = movieInfo.getString(OWM_POSTER_PATH);
+
+                resultStrs[i] = poster_path;
+            }
+
+            return resultStrs;
         }
     }
 }

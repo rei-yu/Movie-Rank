@@ -12,4 +12,7 @@
 
     <string name="pref_rank_label_popular">Popularity</string>
     <string name="pref_rank_label_rate">Rate</string>
+
+    <string name="get_poster">get_poster</string>
+    <string name="get_detail">get_detail</string>
 </resources>
